@@ -1,0 +1,23 @@
+name: kstu_model_education_analisys_tool
+channels:
+  - pytorch
+  - nvidia
+dependencies:
+  - python=3.8
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=12.1
+  - MKL<=2024.0
+  - numpy
+  - python-snappy
+  - tensorboard
+  - opencv
+  - ffmpeg
+  - pocl
+  - atari_py
+  - moviepy
+  - psutil
+  - pip:
+    - dearpygui
+    - gymnasium[atari,classic-control,accept-rom-license]
