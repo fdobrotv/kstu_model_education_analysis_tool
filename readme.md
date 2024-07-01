@@ -17,3 +17,7 @@ and use
     python main.py
 
 Select R2D2 algorithm, fill parameters and press "start"
+
+# Prototypes in Colab
+
+The latest code demonstrated in V13 of draft, it has been tested with PPO, DQN and A2C.
