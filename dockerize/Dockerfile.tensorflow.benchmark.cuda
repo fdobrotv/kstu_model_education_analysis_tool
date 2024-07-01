@@ -1,0 +1,27 @@
+FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04
+
+RUN apt-get update; apt-get install git nvidia-cuda-toolkit -y; 
+
+WORKDIR /benchmark
+
+# RUN mkdir /benchmark
+# RUN cd /benchmark
+# RUN git clone https://github.com/stanford-futuredata/dawn-bench-models.git
+
+# RUN cd dawn-bench-models/tensorflow/CIFAR10/
+# RUN if [ ! -f "cifar-10-binary.tar.gz" ]; then \
+#         curl -o cifar-10-binary.tar.gz https://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz; \
+#     fi
+# RUN if [ ! -d "cifar10" ]; then \
+#         tar xf cifar-10-binary.tar.gz; mv cifar-10-batches-bin cifar10; \
+#     fi
+# RUN pip install matplotlib
+# RUN python3 resnet/resnet_main.py --train_data_path=cifar10/data_batch* \
+#                                 --log_root=/tmp/resnet_model \
+#                                 --train_dir=/tmp/resnet_model/train \
+#                                 --dataset='cifar10' \
+#                                 --model='resnet20' \
+#                                 --num_gpus=1; end=`date +%s`;runtime=$((end-start));echo $runtime;
+
+# RUN git clone https://github.com/aime-team/tf1-benchmarks.git
+# RUN start=`date +%s`; python tf1-benchmarks/scripts/tf_cnn_benchmarks/tf_cnn_benchmarks.py --num_gpus=1 --model=resnet50 --variable_update=parameter_server --batch_size=128; end=`date +%s`;runtime=$((end-start));echo $runtime;

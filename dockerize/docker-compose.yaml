@@ -1,0 +1,158 @@
+services:
+  my-gymnasium-atari-docker:
+    container_name: my-gymnasium-atari-docker
+    build: .
+    ports:
+      - "8888:8888"
+    ipc: host
+    pid: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ./example:/tf/tensorflow-tutorials
+  my-tensorflow-atari:
+    container_name: my-tensorflow-atari
+    build: 
+      context: ./
+      dockerfile: ./Dockerfile.tensorflow
+    ports:
+      - "8888:8888"
+    ipc: host
+    pid: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ./example:/example
+  my-colab:
+    container_name: my-colab
+    image: us-docker.pkg.dev/colab-images/public/runtime:latest
+    networks:
+      - ml
+    ports:
+      - "9000:8080"
+    ipc: host
+    pid: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ./example:/example
+      # - tensorflow-logs:/tf_logs
+      - ./tf_logs:/tf_logs
+      - ./models:/models
+      - ./ROMS:/ROMS
+      - ./wandb:/content/wandb
+      - ./wandb_videos:/content/videos_path
+  
+    # environment:
+      # FLASK_DEBUG: "true"
+  # gpu-test:
+  #   image: nvidia/cuda:12.3.1-base-ubuntu22.04
+  #   command: nvidia-smi
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - driver: nvidia
+  #           count: 1
+  #           capabilities: [gpu]
+  tensorflow:
+    image: tensorflow/tensorflow:latest-gpu-py3-jupyter
+    networks:
+      - ml
+    ports:
+      - "6006:6006"
+      - "8888:8888"
+    volumes:
+      # - tensorflow-logs:/tf_logs:ro
+      - ./tf_logs:/tf_logs:ro
+      - ./example:/notebooks
+      #Entrypoint: tensorboard --logdir /logdir
+
+  # Check https://github.com/Toumash/mlflow-docker/blob/master/docker-compose.yml
+  # mlflow:
+  #   image: ubuntu/mlflow:2.1.1_1.0-22.04
+  #   container_name: tracker_mlflow
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5000:5000"
+  #   # environment:
+  #   #   - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+  #   #   - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+  #   #   - AWS_DEFAULT_REGION=${AWS_REGION}
+  #   #   - MLFLOW_S3_ENDPOINT_URL=http://s3:9000
+  #   # networks:
+  #   #   - public
+  #   #   - internal
+  #   entrypoint: mlflow server --backend-store-uri mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE} --default-artifact-root s3://${AWS_BUCKET_NAME}/ --artifacts-destination s3://${AWS_BUCKET_NAME}/ -h 0.0.0.0
+  #   # depends_on:
+  #   #   wait-for-db:
+  #   #     condition: service_completed_successfully
+  my-long-benchmark:
+    container_name: my-long-benchmark
+    build: 
+      context: ./
+      dockerfile: ./Dockerfile.tensorflow.benchmark
+    ipc: host
+    pid: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    privileged: true
+    volumes:
+      - ./benchmark:/benchmark
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  wandb:
+    container_name: wandb-local
+    image: wandb/local
+    networks:
+      - ml
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./wandb:/vol
+  optuna:
+    container_name: optuna-dashboard
+    image: ghcr.io/optuna/optuna-dashboard:latest
+    networks:
+      - ml
+    ports:
+      - "8082:8080"
+
+volumes:
+  tensorflow-logs:
+
+networks:
+  ml:

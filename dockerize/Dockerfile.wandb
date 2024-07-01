@@ -1,0 +1,7 @@
+FROM wandb/local
+
+RUN /usr/bin/python3 -m pip install --upgrade pip
+RUN pip install wandb
+
+EXPOSE 8888
+ENTRYPOINT [ "wandb", "server", "start" ]
